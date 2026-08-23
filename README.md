@@ -1,4 +1,4 @@
-# love-boilerplate-2026
+# loveplate-2026
 
 [LÖVE](https://love2d.org/) game boilerplate. Entry: `main.lua` → `conf.lua` sets `G` (title, resolution, scale, flags).
 

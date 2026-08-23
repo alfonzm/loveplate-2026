@@ -1,5 +1,5 @@
 G = {
-  title = 'LÖVE Boilerplate',
+  title = 'loveplate-2026',
   scale = 3,
   -- tile_size = 16,
   width = 16 * 36,
