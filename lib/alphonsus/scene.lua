@@ -134,12 +134,16 @@ end
 function Scene:stateUpdate(dt)
 end
 
+-- custom draw function for scenes
+-- override this as needed
+function Scene:stateDraw()
+end
+
 function Scene:onLeave()
     cameraFollow.cleanup(self)
 end
 
 function Scene:draw(postWorld)
-    love.graphics.clear(unpack(self.bgColor))
     Pixelate:start()
 
     -- Draw world with world-only shaders (vignette)
@@ -149,6 +153,7 @@ function Scene:draw(postWorld)
             self:drawWorld()
         end)
     else
+        love.graphics.clear(unpack(self.bgColor))
         self:drawWorld()
     end
 
@@ -180,6 +185,7 @@ function Scene:drawWorld()
         end
         shack:apply()
         drawSystem(e, e, self.camera)
+        self:stateDraw()
         if cam then
             love.graphics.pop()
         end
