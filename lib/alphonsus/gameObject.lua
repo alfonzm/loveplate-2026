@@ -33,6 +33,11 @@ function GameObject:is(name)
     return self.name == name
 end
 
+--- True while draw system is rendering the shadow pass. Skip setting normal draw color when true.
+function GameObject:isShadowPass()
+    return self._isShadowPass == true
+end
+
 function GameObject:getDistanceBetween(other)
     local r1 = math.max(self.width, self.height) * 0.5 * (self.sizeModifier or 1)
     local r2 = math.max(other.width, other.height) * 0.5 * (other.sizeModifier or 1)
