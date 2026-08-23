@@ -3,4 +3,5 @@ return {
     require("shaders.chromasep"),
     require("shaders.scanlines"),
     require("shaders.shockwave"),
+    -- require("shaders.grayscale"),
 }
