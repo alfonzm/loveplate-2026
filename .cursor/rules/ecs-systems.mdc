@@ -1,0 +1,30 @@
+---
+description: How to add Knife ECS systems and wire them in this LÖVE boilerplate
+globs: systems/**/*.lua
+alwaysApply: false
+---
+
+# ECS systems (Knife)
+
+## Pattern
+
+- Build systems with `System({ aspect1, aspect2, ... }, function(aspect1, aspect2, e, dt) ... end)` from `lib.knife.system`. Aspects are field names on the entity; the entity is always passed as `e` before `dt` when the signature includes `dt`.
+- **Return value**: `return system` (the function Knife returns). Scene requires it once and calls `mySystem(e, e, dt)` per entity.
+
+## Where to register
+
+- **`lib/alphonsus/scene.lua`**: `require` the system next to the other `systems.*` requires, then invoke it inside the entity loop in **`Scene:update`**. Order matters: run a system **before** any system that depends on its side effects (e.g. magnet sets `movable.acceleration` → run **before** `movableSystem`).
+
+## Components
+
+- An entity can have components denoted by an object in the entity. e.g. `player.shooter = { damage = 1, attackSpeed = 2 }`
+- The system then uses this to detect entities that have this component (e.g. the first param in the system code)
+- Store data as plain tables on the entity, e.g. `self.magnet = { target = nil, accel = ..., maxSpeed = ..., pickupRadius = ... }`. Initialize literals in the entity constructor unless the project already uses a shared factory.
+- Do not put game-specific outcome logic inside generic systems if another entity might need different behavior. Prefer a **narrow lifecycle hook** on the entity (e.g. `onMagnetTargetReached(target)`) and let the entity handle domain logic.
+- Systems should only do functionalities related to their aspect, and should not care about other game behavior.
+
+## Example (magnet)
+
+- **`systems/magnet.lua`**: Homes `movable` entities toward `magnet.target`; when within `magnet.pickupRadius`, calls `e:onMagnetTargetReached(p)` only.
+- Entity side: define `magnet` stats and implement `onMagnetTargetReached` with your pickup/collect logic.
+- Reusable pattern: system = generic physics/state; entity = rules and side effects.

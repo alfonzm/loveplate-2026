@@ -1,0 +1,30 @@
+---
+description: General coding guidelines for this LÖVE2D project
+alwaysApply: true
+---
+
+# Coding Guidelines
+
+## Avoid Hasty Abstractions
+
+We want abstraction especially for reusable systems to avoid duplicate code.
+However, do not make early or pre-mature assumptions. For example, only add function parameters that are actually used by its callers. When the time comes that we need more params, only then should we add them.
+
+## Performance
+
+We want to prioritize performance over realistic physics and accuracy. Remember that this is a 2D pixel-art game so as long as it feels good, we don't need to make the graphics/maths/collissions extremely accurate and precise.
+
+## Code Architecture
+
+This project uses an ECS or entity-component-system architecture.
+Always use existing entities/components/systems and extend them or create new ones when possible.
+The knife library handles the ECS system of this game.
+
+## Tweening & Easing
+
+Always use the **flux** library for tweening and easing functions.
+Use xxxFlux to store the flux instance if needed.
+Example:
+```lua
+targetFlux = flux.to(self, duration, { x = targetX }):ease("quadout")
+```
