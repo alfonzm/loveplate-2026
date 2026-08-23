@@ -3,12 +3,6 @@ local Shockwaves = {
     _shockwaveFlux = nil,
 }
 
-function Shockwaves.worldToUV(wx, wy, cam)
-    cam = cam or { x = 0, y = 0 }
-    return (wx - cam.x + G.width * 0.5) / G.width,
-        (wy - cam.y + G.height * 0.5) / G.height
-end
-
 function Shockwaves.trigger(worldX, worldY, opts)
     opts = opts or {}
     local duration = opts.duration or 0.75

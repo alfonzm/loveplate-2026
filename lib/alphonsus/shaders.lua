@@ -5,6 +5,14 @@ local Shaders = {
     postAll = nil,
 }
 
+function Shaders:worldToUV(wx, wy, cam)
+    if cam then
+        return (wx - cam.x + G.width * 0.5) / G.width,
+            (wy - cam.y + G.height * 0.5) / G.height
+    end
+    return wx / G.width, wy / G.height
+end
+
 local function buildChain(w, h, entries)
     if not entries or #entries == 0 then
         return nil
@@ -29,7 +37,7 @@ end
 
 function Shaders:init()
     local w, h = love.graphics.getDimensions()
-    self.postWorld = buildChain(w, h, require("shaders.postWorld"))
+    self.postWorld = buildChain(G.width, G.height, require("shaders.postWorld"))
     self.postAll = buildChain(w, h, require("shaders.postAll"))
 end
 

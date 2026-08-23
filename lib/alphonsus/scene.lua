@@ -145,6 +145,7 @@ function Scene:draw(postWorld)
     -- Draw world with world-only shaders (vignette)
     if postWorld then
         postWorld(function()
+            love.graphics.clear(unpack(self.bgColor))
             self:drawWorld()
         end)
     else
