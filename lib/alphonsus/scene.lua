@@ -155,6 +155,15 @@ function Scene:draw(postWorld)
     self:drawUI()
 
     Pixelate:finish()
+    self:drawDebugOverlay()
+end
+
+function Scene:drawDebugOverlay()
+    if G.debug then
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.print("FPS: " .. tostring(love.timer.getFPS()), 10, 10)
+        love.graphics.print("Entities: " .. tostring(#self.entities), 10, 25)
+    end
 end
 
 function Scene:drawWorld()
@@ -212,12 +221,6 @@ function Scene:drawUI()
     --     -- end)
     -- end
     -- -- push:finish()
-
-    if G.debug then
-        love.graphics.setColor(1, 1, 1, 1)
-        love.graphics.print("FPS: " .. tostring(love.timer.getFPS()), 10, 10)
-        love.graphics.print("Entities: " .. tostring(#self.entities), 10, 25)
-    end
 end
 
 -- ====================================
