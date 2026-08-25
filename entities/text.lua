@@ -21,6 +21,7 @@ function Text:new(opts)
     self.color = opts.color or { 1, 1, 1, 1 }
     self.textAlign = opts.textAlign or "left"
     self.shouldUiDraw = not not opts.shouldUiDraw
+    self.shouldPixelate = opts.shouldPixelate ~= false
     self.visible = opts.visible ~= false
     self.textScale = 1
     self._bounceTween = nil
@@ -120,16 +121,15 @@ function Text:bounce(scale)
         end)
 end
 
-local function paint(self)
+local function paint(self, drawX, drawY)
     love.graphics.setFont(self.font)
     love.graphics.setColor(self.color)
     local text = self.text
-    local anchorX = math.floor(self.x + 0.5)
-    local y = math.floor(self.y + 0.5)
+    drawX = drawX or math.floor(self.x + 0.5)
+    local y = drawY or math.floor(self.y + 0.5)
     local w = self.font:getWidth(text)
-    local drawX = anchorX
     if self.textAlign == "center" then
-        drawX = math.floor(anchorX - w * 0.5 + 0.5)
+        drawX = math.floor(drawX - w * 0.5 + 0.5)
     end
     local scale = self.textScale
     if scale ~= 1 then
@@ -143,22 +143,48 @@ local function paint(self)
     love.graphics.print(text, drawX, y)
 end
 
-function Text:draw()
-    if self.shouldUiDraw or not self.visible then
+local function render(self, cam, overlay)
+    if not self.visible then
         return
     end
+    if overlay then
+        if self.shouldPixelate then
+            return
+        end
+    elseif not self.shouldPixelate then
+        return
+    end
+
     love.graphics.push("all")
-    paint(self)
+    if overlay then
+        local lx, ly = self.x, self.y
+        if cam and not self.shouldUiDraw then
+            lx = lx - cam.x + G.width * 0.5
+            ly = ly - cam.y + G.height * 0.5
+        end
+        paint(
+            self,
+            math.floor(lx * G.scale + 0.5),
+            math.floor(ly * G.scale + 0.5)
+        )
+    else
+        paint(self)
+    end
     love.graphics.pop()
 end
 
-function Text:uiDraw()
-    if not self.shouldUiDraw or not self.visible then
+function Text:draw(cam, overlay)
+    if self.shouldUiDraw then
         return
     end
-    love.graphics.push("all")
-    paint(self)
-    love.graphics.pop()
+    render(self, cam, overlay)
+end
+
+function Text:uiDraw(cam, overlay)
+    if not self.shouldUiDraw then
+        return
+    end
+    render(self, cam, overlay)
 end
 
 return Text

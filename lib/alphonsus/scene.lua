@@ -158,9 +158,12 @@ function Scene:draw(postWorld)
     end
 
     -- Draw UI without world shaders
-    self:drawUI()
+    self:drawUIPostWorldShaders()
 
     Pixelate:finish()
+
+    self:drawUiPostPixelate()
+
     self:drawDebugOverlay()
 end
 
@@ -205,7 +208,7 @@ function Scene:drawWorld()
     love.graphics.pop()
 end
 
-function Scene:drawUI()
+function Scene:drawUIPostWorldShaders()
     for _, e in ipairs(self.entities) do
         if e.uiDraw then
             e:uiDraw()
@@ -228,6 +231,18 @@ function Scene:drawUI()
     --     -- end)
     -- end
     -- -- push:finish()
+end
+
+function Scene:drawUiPostPixelate()
+    for _, e in ipairs(self.entities) do
+        if e.shouldPixelate == false then
+            if e.shouldUiDraw and e.uiDraw then
+                e:uiDraw(self.camera, true)
+            elseif e.draw then
+                e:draw(self.camera, true)
+            end
+        end
+    end
 end
 
 -- ====================================
