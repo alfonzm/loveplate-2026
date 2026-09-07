@@ -14,6 +14,7 @@ G.worldWidth = G.width * 3
 G.worldHeight = G.height * 3
 
 function love.conf(t)
+  t.identity = "loveplate-2026"
   t.window.title = G.title
   t.window.resizable = false
   t.window.width = G.width * G.scale
