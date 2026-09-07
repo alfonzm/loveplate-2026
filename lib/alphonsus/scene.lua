@@ -26,6 +26,7 @@ local magnetSystem = require "systems.magnet"
 local movableSystem = require "systems.movable"
 local drawSystem = require "systems.draw"
 local moveToAngleSystem = require "systems.moveToAngle"
+local rotateToTargetSystem = require "systems.rotateToTarget"
 local collisionSystem = require "systems.collision"
 local hpSystem = require "systems.hp"
 local movesWithSystem = require "systems.movesWith"
@@ -101,6 +102,7 @@ function Scene:update(dt)
         updateSystem(e, e, dt)
         typingAnimationSystem(e, e, dt)
         magnetSystem(e, e, dt)
+        rotateToTargetSystem(e, e, dt)
         moveToAngleSystem(e, e, dt)
         movableSystem(e, e, dt)
         movesWithSystem(e, e)

@@ -6,6 +6,7 @@ Assets = require 'assets.assets'
 -- libraries
 _ = require("lib.lume")
 Log = require("lib.alphonsus.log")
+Color = require("lib.alphonsus.color")
 Vector = require("lib.vector")
 System = require("lib.knife.system")
 Timer = require("lib.knife.timer")
