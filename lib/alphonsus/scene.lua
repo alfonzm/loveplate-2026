@@ -104,6 +104,8 @@ function Scene:add(e)
         end
         -- e.physicsBody:setSensor(true)
     end
+
+    return e
 end
 
 function Scene:update(dt)
