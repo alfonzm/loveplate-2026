@@ -1,3 +1,13 @@
+-- Usage:
+--   cameraFollow.setTarget(entity, {
+--     offsetX = 0,               -- added to target.x each frame
+--     offsetY = 0,               -- added to target.y each frame
+--     smoothTime = 0.35,         -- higher = slower camera catch-up
+--     lookAheadSmoothTime = 0.5, -- higher = slower look-ahead catch-up
+--     velocityLookAhead = 0.5,   -- px offset per unit of velocity
+--     maxLookAhead = nil,        -- cap look-ahead; nil = ~20% of screen width
+--   })
+
 local smoothTime = 0.35 -- higher = slower camera catch-up
 local lookAheadSmoothTime = 0.5 -- higher = slower offset catch-up
 local velocityLookAhead = 0.5 -- px offset per unit of velocity
