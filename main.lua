@@ -26,7 +26,7 @@ local Sound = require("lib.alphonsus.sound")
 local controls = require("config.controls")
 
 -- scenes
-local Demo = require("scenes.demo")
+local Demo = require("scenes.tilemap")
 
 -- particles
 ParticleSettings = {

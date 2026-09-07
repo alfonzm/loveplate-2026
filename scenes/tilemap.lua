@@ -1,23 +1,18 @@
 local Scene = require "lib.alphonsus.scene"
-local sti = require "lib.sti"
+local Tilemap = require "entities.tilemap"
+local Link = require "entities.link"
+local cameraFollow = require "lib.alphonsus.cameraFollow"
 
 local tilemap = Scene:extend()
-
-local map
 
 function tilemap:enter()
     tilemap.super.enter(self)
 
-    map = sti("assets/tilemaps/main.lua")
-end
+    -- add first so it draws behind gameplay entities
+    self:add(Tilemap("assets/tilemaps/main.lua"))
+    local link = self:add(Link({ x = 20, y = 20 }))
 
-function tilemap:stateUpdate(dt)
-    map:update(dt)
-end
-
-function tilemap:draw()
-    love.graphics.setColor(1, 1, 1, 1)
-    map:draw()
+    cameraFollow.setTarget(link, {smoothTime = 0.5})
 end
 
 return tilemap
