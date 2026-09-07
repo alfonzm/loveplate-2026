@@ -7,10 +7,10 @@
 local Object = require "lib.classic" -- oop
 local Pixelate = require "lib.alphonsus.pixelate" -- pixelate
 local shack = require "lib.shack"
+local flux = require "lib.flux" -- easing
 -- local push = require "lib.push" -- resolution
 -- local gamera = require "lib.gamera" -- camera
 local wf = require "lib.windfield" -- physics
--- local flux = require "lib.flux" -- easing
 
 -- config
 local collisions = require "config.collisions"
@@ -33,19 +33,30 @@ local movesWithSystem = require "systems.movesWith"
 -- local rotatingSystem = require "systems.rotatingSystem"
 local removeSystem = require "systems.remove"
 local cameraFollow = require "lib.alphonsus.cameraFollow"
+local cameraCull = require "lib.alphonsus.cameraCull"
 local glowRenderer = require "lib.alphonsus.glowRenderer"
 -- local topDownMovementSystem = require "systems.topDownMovementSystem"
 
 local Scene = Object:extend()
 
+local isWeb = love.system.getOS() == "Web"
+local DARK_OVERLAY_VISIBLE = isWeb and { 26 / 255, 12 / 255, 26 / 255, 0.6 } or { 0, 0, 0, 0.5 }
+local DARK_OVERLAY_HIDDEN = isWeb and { 26 / 255, 12 / 255, 26 / 255, 0 } or { 0, 0, 0, 0 }
+
 function Scene:new()
     self.bgColor = { 0.06, 0.06, 0.06, 1 }
+
+    -- rendered on top of world elements; useful for transitions and modal UI
+    self.bgOverlayColor = { 0, 0, 0, 0 }
+
     return self
 end
 
 function Scene:enter()
     self.entities = {}
     self.systems = {}
+
+    self.bgOverlayColor = { 0, 0, 0, 0 }
 
     self.physicsWorld = wf.newWorld(0, 0, false)
     self.physicsWorld:setExplicitCollisionEvents(true)
@@ -113,17 +124,19 @@ function Scene:update(dt)
         removeSystem(e, i, self.entities)
     end
 
-    cameraFollow.update(self)
+    cameraFollow.update(self, dt)
     shack:update(dt)
 
     -- self.camera:update(dt)
 
-    if Input.wasPressed('debug') then
-        G.debug = not G.debug
-    end
+    if G.dev then
+        if Input.wasPressed('debug') then
+            G.debug = not G.debug
+        end
 
-    if Input.wasPressed('debugCollider') then
-        G.debugCollider = not G.debugCollider
+        if Input.wasPressed('debugCollider') then
+            G.debugCollider = not G.debugCollider
+        end
     end
 
     self:stateUpdate(dt)
@@ -160,13 +173,23 @@ function Scene:draw(postWorld)
     end
 
     -- Draw UI without world shaders
-    self:drawUIPostWorldShaders()
+    self:drawUiPostShaders()
 
     Pixelate:finish()
 
-    self:drawUiPostPixelate()
+    self:drawUiPostPixelate(true)
+    self:drawOverlay()
+    self:drawUiPostPixelate(false)
 
     self:drawDebugOverlay()
+end
+
+function Scene:showDarkOverlay(tween)
+    flux.to(self.bgOverlayColor, tween or 0.1, DARK_OVERLAY_VISIBLE):ease("quadinout")
+end
+
+function Scene:hideDarkOverlay()
+    flux.to(self.bgOverlayColor, 0.1, DARK_OVERLAY_HIDDEN):ease("quadinout")
 end
 
 function Scene:drawDebugOverlay()
@@ -182,17 +205,22 @@ function Scene:drawWorld()
 
     for _, e in ipairs(self.entities) do
         local cam = self.camera
-        if cam then
-            love.graphics.push()
-            local parallax = e.cameraParallax
-            if parallax == nil then parallax = 1 end
-            love.graphics.translate(G.width / 2 - cam.x * parallax, G.height / 2 - cam.y * parallax)
-        end
-        shack:apply()
-        drawSystem(e, e, self.camera)
-        self:stateDraw()
-        if cam then
-            love.graphics.pop()
+        local visible = not cam or cameraCull.isVisible(e, cam)
+        if visible then
+            if cam then
+                love.graphics.push()
+                -- higher parallax = slower / more distant
+                -- lower parallax = faster / closer
+                local parallax = e.cameraParallax
+                if parallax == nil then parallax = 1 end
+                love.graphics.translate(G.width / 2 - cam.x * parallax, G.height / 2 - cam.y * parallax)
+            end
+            shack:apply()
+            drawSystem(e, e, self.camera)
+            self:stateDraw()
+            if cam then
+                love.graphics.pop()
+            end
         end
     end
 
@@ -203,41 +231,36 @@ function Scene:drawWorld()
             love.graphics.translate(G.width / 2 - cam.x, G.height / 2 - cam.y)
         end
         self.physicsWorld:draw(0.5)
+        if self.drawDebugColliders then
+            self:drawDebugColliders()
+        end
         love.graphics.pop()
     end
 
     glowRenderer.draw(self.entities, self.camera)
+
     love.graphics.pop()
 end
 
-function Scene:drawUIPostWorldShaders()
+function Scene:drawOverlay()
+    if self.bgOverlayColor[4] > 0 then
+        love.graphics.setColor(self.bgOverlayColor)
+        love.graphics.rectangle("fill", 0, 0, G.width * G.scale, G.height * G.scale)
+        love.graphics.setColor(1, 1, 1, 1)
+    end
+end
+
+function Scene:drawUiPostShaders()
     for _, e in ipairs(self.entities) do
         if e.uiDraw then
             e:uiDraw()
         end
     end
-    -- -- push:start()
-    -- love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
-
-    -- local layers = _.sort(_.unique(_.map(self.entities, function(e) return e.parallax end)))
-
-    -- for i, parallax in ipairs(layers) do
-    --     -- self.camera.cam:setPosition(self.camera.pos.x * parallax, self.camera.pos.y * parallax)
-    --     -- self.camera.cam:draw(function(l,t,w,h)
-    --         -- shack:apply()
-    --         local entitiesOfLayer = _.filter(self.entities, function(e) return e.parallax == parallax end)
-    --         local sortedEntities = _.sort(entitiesOfLayer, function(a,b) return a.layer < b.layer end)
-    --         for _, e in ipairs(sortedEntities) do
-    --             -- drawSystem(e, e)
-    --         end
-    --     -- end)
-    -- end
-    -- -- push:finish()
 end
 
-function Scene:drawUiPostPixelate()
+function Scene:drawUiPostPixelate(behindOverlay)
     for _, e in ipairs(self.entities) do
-        if e.shouldPixelate == false then
+        if e.shouldPixelate == false and (e.drawBehindOverlay == true) == behindOverlay then
             if e.shouldUiDraw and e.uiDraw then
                 e:uiDraw(self.camera, true)
             elseif e.draw then
@@ -274,31 +297,37 @@ end
 -- ====================================
 --          HELPER FUNCTIONS
 -- ====================================
+
 function Scene:getObject(tag)
     return _.filter(self.entities, function(e)
         return e[tag] == true
     end)
 end
 
+function Scene:getObjectsByTag(tag)
+    return _.filter(self.entities, function(e)
+        return e.tag and e.tag == tag
+    end)
+end
+
 function Scene:getNearestEntityFromSource(source, maxDistance, tag)
-    -- get visible entities except source
     local filteredEntities = _.reject(self.entities, function(e)
-        return source.pos.x == e.pos.x and source.pos.y == e.pos.y
+        return source.x == e.x and source.y == e.y
     end)
 
     if tag then
         filteredEntities = _.filter(filteredEntities, function(e) return e.tag == tag end)
     end
 
-    local visibleEntities = self.camera:getVisibleEntities(filteredEntities)
+    local visibleEntities = _.filter(filteredEntities, function(e)
+        return cameraCull.isVisible(e, self.camera)
+    end)
 
     if maxDistance then
-        -- filter max distance
         visibleEntities = _.filter(visibleEntities, function(e) return e:distanceFrom(source) < maxDistance end)
     end
 
-    -- sort visible entities by distance to source (ascending)
-    local sortedEntities = _.sort(visibleEntities, function(a,b)
+    local sortedEntities = _.sort(visibleEntities, function(a, b)
         return a:distanceFrom(source) < b:distanceFrom(source)
     end)
 
@@ -307,8 +336,33 @@ end
 
 function Scene:getNearbyEntitiesFromSource(source, distance, tag)
     return _.filter(self.entities, function(e)
-        return _.distance(source.pos.x, source.pos.y, e.pos.x, e.pos.y) < distance and e.tag == tag
+        return _.distance(source.x, source.y, e.x, e.y) < distance and e.tag == tag
     end)
+end
+
+function Scene:getVisibleEntitiesWithTag(tag, limitCount)
+    local visibleEntities = {}
+
+    for i = 1, #self.entities do
+        local e = self.entities[i]
+        if e.tag and e.tag:sub(1, #tag) == tag and cameraCull.isVisible(e, self.camera) then
+            visibleEntities[#visibleEntities + 1] = e
+            if limitCount and #visibleEntities >= limitCount then
+                break
+            end
+        end
+    end
+
+    return visibleEntities
+end
+
+function Scene:removeAllOfTag(tag)
+    for i = #self.entities, 1, -1 do
+        local e = self.entities[i]
+        if e.tag and e.tag == tag then
+            e:remove()
+        end
+    end
 end
 
 return Scene

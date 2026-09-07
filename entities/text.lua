@@ -22,6 +22,7 @@ function Text:new(opts)
     self.textAlign = opts.textAlign or "left"
     self.shouldUiDraw = not not opts.shouldUiDraw
     self.shouldPixelate = opts.shouldPixelate ~= false
+    self.drawBehindOverlay = not not opts.drawBehindOverlay
     self.visible = opts.visible ~= false
     self.textScale = 1
     self._bounceTween = nil

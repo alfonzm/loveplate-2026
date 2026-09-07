@@ -16,6 +16,7 @@ Director = require("lib.alphonsus.director")
 local Pixelate = require("lib.alphonsus.pixelate")
 local Shaders = require("lib.alphonsus.shaders")
 local Input = require("lib.alphonsus.input")
+local Sound = require("lib.alphonsus.sound")
 
 -- -- Enable live coding
 -- local lick = require("lib.lick")
@@ -45,11 +46,12 @@ function love.load()
     Pixelate:init(G.width, G.height, G.scale)
     Shaders:init()
     Input.register(controls)
+    Sound.register(Assets.sounds)
     Director:switch(Demo())
 end
 
 function love.update(dt)
-    if love.keyboard.isDown("q") then
+    if G.dev and love.keyboard.isDown("q") then
         love.event.quit()
     end
 

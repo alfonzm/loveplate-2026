@@ -17,9 +17,19 @@ local function pixelFontAt(path, size)
   return cached
 end
 
+local function getImagePath(filename)
+  return "assets/img/" .. filename
+end
+
+local function getSoundPath(filename)
+  return "assets/sounds/" .. filename
+end
+
 return {
   pixelFontAt = pixelFontAt,
-  whiteCircle = 'assets/img/white_circle.png',
+  getImagePath = getImagePath,
+  getSoundPath = getSoundPath,
+  whiteCircle = getImagePath('white_circle.png'),
   colors = {
     white = { 1, 1, 1, 1 },
   },
@@ -32,4 +42,5 @@ return {
     md = 16,
     lg = 24,
   },
+  sounds = {},
 }

@@ -38,6 +38,12 @@ function GameObject:isShadowPass()
     return self._isShadowPass == true
 end
 
+function GameObject:distanceFrom(other)
+    local dx = self.x - other.x
+    local dy = self.y - other.y
+    return math.sqrt(dx * dx + dy * dy)
+end
+
 function GameObject:getDistanceBetween(other)
     local r1 = math.max(self.width, self.height) * 0.5 * (self.sizeModifier or 1)
     local r2 = math.max(other.width, other.height) * 0.5 * (other.sizeModifier or 1)
@@ -101,10 +107,11 @@ function GameObject:addBasicMovable()
         velocity = { x = 0, y = 0 },
         acceleration = { x = 0, y = 0 },
         drag = { x = 0, y = 0 },
-        maxVelocity = { x = 0, y = 0 },
+        maxVelocity = { x = 100, y = 100 },
         angularVelocity = 0,
         angularAcceleration = 0,
         angularDrag = 0,
+        rotateSpeed = 10,
     }
 end
 

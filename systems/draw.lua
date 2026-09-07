@@ -3,6 +3,22 @@ local system = System(
     function (draw, e)
         assert(type(draw) == 'function')
 
+        love.graphics.setColor(1, 1, 1, 1)
+
+        if e.sprite then
+            local sprite = e.sprite
+            love.graphics.draw(
+                sprite,
+                e.x,
+                e.y,
+                e.angle,
+                e.scaleX or 1,
+                e.scaleY or 1,
+                e.offsetX or 0,
+                e.offsetY or 0
+            )
+        end
+
         if e.shadow then
             local shadow = e.shadow
             local color = shadow.color
@@ -17,6 +33,7 @@ local system = System(
 
         love.graphics.setColor(1, 1, 1, 1)
         draw(e)
+        love.graphics.setColor(1, 1, 1, 1)
     end
 )
 

@@ -1,4 +1,7 @@
 G = {
+  -- set to false on release/build
+  dev = true,
+
   title = 'loveplate-2026',
   scale = 3,
   -- tile_size = 16,
