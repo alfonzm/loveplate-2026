@@ -95,7 +95,8 @@ function Scene:add(e)
     local col = e.collider
     if col and col.x and col.y and col.w and col.h then
         e.physicsBody = self.physicsWorld:newRectangleCollider(col.x, col.y, col.w, col.h)
-        e.physicsBody:setPosition(e.x, e.y)
+        local cx, cy = e:getColliderCenter()
+        e.physicsBody:setPosition(cx, cy)
         e.physicsBody:setAngle(e.angle and e.angle or 0)
         e.physicsBody:setCollisionClass(e.name)
         e.physicsBody:setObject(e)
@@ -105,8 +106,6 @@ function Scene:add(e)
 end
 
 function Scene:update(dt)
-    self.physicsWorld:update(dt)
-
     for i, e in ipairs(self.entities) do
         updateSystem(e, e, dt)
         typingAnimationSystem(e, e, dt)
@@ -115,6 +114,27 @@ function Scene:update(dt)
         moveToAngleSystem(e, e, dt)
         movableSystem(e, e, dt)
         movesWithSystem(e, e)
+
+        -- move the physics body to match the entity's position
+        -- and angle before updating the physics world
+        if e.physicsBody then
+            e.physicsBody:setLinearVelocity(0, 0)
+            local cx, cy = e:getColliderCenter()
+            e.physicsBody:setPosition(cx, cy)
+            e.physicsBody:setAngle(e.angle and e.angle or 0)
+        end
+    end
+
+    self.physicsWorld:update(dt)
+
+    for i, e in ipairs(self.entities) do
+        -- after updating the physics world,
+        -- update the entity's position to match the physics body
+        if e.physicsBody then
+            local cx, cy = e.physicsBody:getPosition()
+            e:setPositionFromColliderCenter(cx, cy)
+        end
+
         collisionSystem(e, e)
         hpSystem(e, e, dt)
         -- topDownMovementSystem(e, e, dt)

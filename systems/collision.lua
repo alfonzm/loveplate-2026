@@ -21,11 +21,6 @@ end
 local system = System(
     { '-collider', '-physicsBody' },
     function (e)
-        if e.physicsBody then
-            e.physicsBody:setPosition(e.x, e.y)
-            e.physicsBody:setAngle(e.angle and e.angle or 0)
-        end
-
         local collidableClasses = getCollidableClasses(e.name)
 
         -- check if any collidable classes have collided

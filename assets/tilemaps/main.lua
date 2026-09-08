@@ -42,7 +42,103 @@ return {
       tilecount = 25,
       tiles = {
         {
+          id = 0,
+          properties = {
+            ["collidable"] = false
+          }
+        },
+        {
+          id = 1,
+          properties = {
+            ["collidable"] = false
+          }
+        },
+        {
+          id = 2,
+          properties = {
+            ["collidable"] = false
+          }
+        },
+        {
+          id = 3,
+          properties = {
+            ["collidable"] = true
+          }
+        },
+        {
+          id = 4,
+          properties = {
+            ["collidable"] = true
+          }
+        },
+        {
           id = 5,
+          properties = {
+            ["collidable"] = true
+          }
+        },
+        {
+          id = 6,
+          properties = {
+            ["collidable"] = false
+          }
+        },
+        {
+          id = 7,
+          properties = {
+            ["collidable"] = false
+          }
+        },
+        {
+          id = 8,
+          properties = {
+            ["collidable"] = false
+          }
+        },
+        {
+          id = 9,
+          properties = {
+            ["collidable"] = false
+          }
+        },
+        {
+          id = 10,
+          properties = {
+            ["collidable"] = false
+          }
+        },
+        {
+          id = 11,
+          properties = {
+            ["collidable"] = false
+          }
+        },
+        {
+          id = 12,
+          properties = {
+            ["collidable"] = true
+          }
+        },
+        {
+          id = 13,
+          properties = {
+            ["collidable"] = true
+          }
+        },
+        {
+          id = 14,
+          properties = {
+            ["collidable"] = true
+          }
+        },
+        {
+          id = 15,
+          properties = {
+            ["collidable"] = true
+          }
+        },
+        {
+          id = 16,
           properties = {
             ["collidable"] = true
           }
@@ -66,9 +162,33 @@ return {
           }
         },
         {
+          id = 20,
+          properties = {
+            ["collidable"] = true
+          }
+        },
+        {
+          id = 21,
+          properties = {
+            ["collidable"] = true
+          }
+        },
+        {
+          id = 22,
+          properties = {
+            ["collidable"] = true
+          }
+        },
+        {
           id = 23,
           properties = {
             ["collidable"] = true
+          }
+        },
+        {
+          id = 24,
+          properties = {
+            ["collidable"] = false
           }
         }
       }
