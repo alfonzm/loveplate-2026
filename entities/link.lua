@@ -15,7 +15,10 @@ function Link:new(opts)
     self.offsetX = self.sprite:getWidth() / 2
     self.offsetY = self.sprite:getHeight() / 2
 
-    self:addBasicCollider()
+    self:addBasicCollider(1)
+    self.collider.w = 8
+    self.collider.h = 8
+    self.collider.oy = 4
 
     return self
 end
