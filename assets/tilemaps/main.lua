@@ -40,7 +40,38 @@ return {
       properties = {},
       wangsets = {},
       tilecount = 25,
-      tiles = {}
+      tiles = {
+        {
+          id = 5,
+          properties = {
+            ["collidable"] = "1"
+          }
+        },
+        {
+          id = 17,
+          properties = {
+            ["collidable"] = "1"
+          }
+        },
+        {
+          id = 18,
+          properties = {
+            ["collidable"] = "1"
+          }
+        },
+        {
+          id = 19,
+          properties = {
+            ["collidable"] = "1"
+          }
+        },
+        {
+          id = 23,
+          properties = {
+            ["collidable"] = "1"
+          }
+        }
+      }
     }
   },
   layers = {
