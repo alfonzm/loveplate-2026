@@ -44,31 +44,31 @@ return {
         {
           id = 5,
           properties = {
-            ["collidable"] = "1"
+            ["collidable"] = true
           }
         },
         {
           id = 17,
           properties = {
-            ["collidable"] = "1"
+            ["collidable"] = true
           }
         },
         {
           id = 18,
           properties = {
-            ["collidable"] = "1"
+            ["collidable"] = true
           }
         },
         {
           id = 19,
           properties = {
-            ["collidable"] = "1"
+            ["collidable"] = true
           }
         },
         {
           id = 23,
           properties = {
-            ["collidable"] = "1"
+            ["collidable"] = true
           }
         }
       }
