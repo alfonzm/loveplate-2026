@@ -24,15 +24,25 @@ function Link:new(opts)
 end
 
 function Link:update(dt)
+    local dx, dy = 0, 0
+    local speed = 60 * dt
+
     if Input.isDown("up") then
-        self.y = self.y - 60 * dt
+        dy = dy - speed
     elseif Input.isDown("down") then
-        self.y = self.y + 60 * dt
+        dy = dy + speed
     end
     if Input.isDown("left") then
-        self.x = self.x - 60 * dt
+        dx = dx - speed
     elseif Input.isDown("right") then
-        self.x = self.x + 60 * dt
+        dx = dx + speed
+    end
+
+    if dx ~= 0 and not self:overlaps("tilelayer", self.x + dx, self.y) then
+        self.x = self.x + dx
+    end
+    if dy ~= 0 and not self:overlaps("tilelayer", self.x, self.y + dy) then
+        self.y = self.y + dy
     end
 end
 

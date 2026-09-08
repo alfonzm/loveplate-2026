@@ -102,9 +102,43 @@ function GameObject:addBasicCollider(scale)
         y = self.y,
         w = w,
         h = h,
-        ox = w / 2,
-        oy = h / 2
+        ox = 0,
+        oy = 0,
     }
+end
+
+-- collider center in world space; ox/oy offset from entity x/y to collider center
+function GameObject:getColliderCenter(x, y)
+    x = x or self.x
+    y = y or self.y
+    local col = self.collider
+    if not col then return x, y end
+    return x + (col.ox or 0), y + (col.oy or 0)
+end
+
+function GameObject:setPositionFromColliderCenter(cx, cy)
+    local col = self.collider
+    if not col then
+        self.x, self.y = cx, cy
+        return
+    end
+    self.x = cx - (col.ox or 0)
+    self.y = cy - (col.oy or 0)
+end
+
+-- windfield query at optional entity x/y; collisionClasses = string or list of class names
+function GameObject:overlaps(collisionClasses, x, y)
+    local world = self.scene and self.scene.physicsWorld
+    local col = self.collider
+    if not world or not col then return false end
+
+    if type(collisionClasses) == "string" then
+        collisionClasses = { collisionClasses }
+    end
+
+    local cx, cy = self:getColliderCenter(x, y)
+    local r = math.max(col.w, col.h) * 0.5 * 0.98
+    return #world:queryCircleArea(cx, cy, r, collisionClasses) > 0
 end
 
 function GameObject:addBasicMovable()
