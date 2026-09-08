@@ -96,13 +96,9 @@ function Scene:add(e)
     if col and col.x and col.y and col.w and col.h then
         e.physicsBody = self.physicsWorld:newRectangleCollider(col.x, col.y, col.w, col.h)
         e.physicsBody:setPosition(e.x, e.y)
-        e.physicsBody:setAngle(e.angle)
+        e.physicsBody:setAngle(e.angle and e.angle or 0)
         e.physicsBody:setCollisionClass(e.name)
         e.physicsBody:setObject(e)
-        if e.physicsBodyType then
-            e.physicsBody:setType(e.physicsBodyType)
-        end
-        -- e.physicsBody:setSensor(true)
     end
 
     return e

@@ -8,8 +8,9 @@
 -- Order matters: each `other` class in enter/exit must already exist.
 
 local collisions = {
-    { name = "player" },
     { name = "wall" },
+    { name = "tilelayer" },
+    { name = "player", enter = { "tilelayer" } },
 }
 
 return collisions

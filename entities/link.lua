@@ -7,14 +7,15 @@ local Link = GameObject:extend()
 function Link:new(opts)
     Link.super.new(self)
     opts = opts or {}
-    self.name = "link"
+    self.name = "player"
     self.x = opts.x or 0
     self.y = opts.y or 0
-
 
     self.sprite = love.graphics.newImage("assets/img/link.png")
     self.offsetX = self.sprite:getWidth() / 2
     self.offsetY = self.sprite:getHeight() / 2
+
+    self:addBasicCollider()
 
     return self
 end

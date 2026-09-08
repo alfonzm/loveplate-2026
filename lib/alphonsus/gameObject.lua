@@ -90,8 +90,13 @@ local MIN_COLLIDER = 2
 
 function GameObject:addBasicCollider(scale)
     scale = scale or 1
-    local w = math.max(self.width * scale, MIN_COLLIDER)
-    local h = math.max(self.height * scale, MIN_COLLIDER)
+
+    local width = self.width or (self.sprite and self.sprite:getWidth() or G.tileSize)
+    local height = self.height or (self.sprite and self.sprite:getHeight() or G.tileSize)
+
+    local w = math.max(width * scale, MIN_COLLIDER)
+    local h = math.max(height * scale, MIN_COLLIDER)
+
     self.collider = {
         x = self.x,
         y = self.y,

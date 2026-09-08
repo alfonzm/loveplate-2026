@@ -10,7 +10,7 @@ function tilemap:enter()
 
     -- add first so it draws behind gameplay entities
     self:add(Tilemap("assets/tilemaps/main.lua"))
-    local link = self:add(Link({ x = 20, y = 20 }))
+    local link = self:add(Link({ x = 16 + 8, y = 16 + 8 }))
 
     cameraFollow.setTarget(link, {smoothTime = 0})
 end
