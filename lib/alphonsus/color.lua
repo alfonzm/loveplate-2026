@@ -43,6 +43,17 @@ local function hslToRgb(h, s, l)
     return hue2rgb(p, q, h + 1 / 3), hue2rgb(p, q, h), hue2rgb(p, q, h - 1 / 3)
 end
 
+--- Converts a "#rrggbb" or "rrggbb" string into a { r, g, b, a } color.
+function Color.fromHex(hex)
+    hex = hex:gsub("#", "")
+    return {
+        tonumber(hex:sub(1, 2), 16) / 255,
+        tonumber(hex:sub(3, 4), 16) / 255,
+        tonumber(hex:sub(5, 6), 16) / 255,
+        1,
+    }
+end
+
 --- Returns a new { r, g, b, a } with the given hue (0–1). Saturation, lightness, and alpha are preserved.
 function Color.toHue(color, hue)
     local r, g, b = color[1], color[2], color[3]

@@ -12,7 +12,7 @@ function tilemap:enter()
     self:add(Tilemap("assets/tilemaps/main.lua"))
     local link = self:add(Link({ x = 20, y = 20 }))
 
-    cameraFollow.setTarget(link, {smoothTime = 0.5})
+    cameraFollow.setTarget(link, {smoothTime = 0})
 end
 
 return tilemap
