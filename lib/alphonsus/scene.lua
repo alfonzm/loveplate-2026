@@ -205,6 +205,37 @@ function Scene:drawDebugOverlay()
     end
 end
 
+function Scene:drawDebugColliders()
+    local world = self.physicsWorld
+    if not world then return end
+
+    love.graphics.setColor(0.2, 1, 0.45, 0.40)
+
+    for _, body in ipairs(world:getBodies()) do
+        for _, fixture in ipairs(body:getFixtures()) do
+            if not fixture:isSensor() then
+                local shape = fixture:getShape()
+                local shapeType = shape:type()
+
+                if shapeType == "PolygonShape" then
+                    love.graphics.polygon("fill", body:getWorldPoints(shape:getPoints()))
+                elseif shapeType == "EdgeShape" or shapeType == "ChainShape" then
+                    local points = { body:getWorldPoints(shape:getPoints()) }
+                    for i = 1, #points - 2, 2 do
+                        love.graphics.line(points[i], points[i + 1], points[i + 2], points[i + 3])
+                    end
+                elseif shapeType == "CircleShape" then
+                    local bx, by = body:getPosition()
+                    local sx, sy = shape:getPoint()
+                    love.graphics.circle("line", bx + sx, by + sy, shape:getRadius())
+                end
+            end
+        end
+    end
+
+    love.graphics.setColor(1, 1, 1, 1)
+end
+
 function Scene:drawWorld()
     love.graphics.push()
 
@@ -235,10 +266,8 @@ function Scene:drawWorld()
         if cam then
             love.graphics.translate(G.width / 2 - cam.x, G.height / 2 - cam.y)
         end
-        self.physicsWorld:draw(0.5)
-        if self.drawDebugColliders then
-            self:drawDebugColliders()
-        end
+        -- self.physicsWorld:draw(1)
+        self:drawDebugColliders()
         love.graphics.pop()
     end
 
