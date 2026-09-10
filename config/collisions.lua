@@ -1,16 +1,20 @@
--- Collision classes for windfield
+-- Collision class names (Windfield bodies use entity.name / this name).
 --
--- name = collision class name
--- enter = classes that trigger an "enter" event when colliding with this class
--- exit = classes that trigger an "exit" event
--- ignores = classes this type does not collide with
---
--- Order matters: each `other` class in enter/exit must already exist.
+-- enter / exit — used by systems/collision.lua for onCollide / onCollideExit
+-- (any order; mutual pairs like player ↔ slime are fine).
+-- ignores — passed to Windfield for fixture category/mask filtering only.
 
 local collisions = {
     { name = "wall" },
     { name = "collidableTiles" },
-    { name = "player", enter = { "collidableTiles" } },
+    {
+        name = "slime",
+        enter = { "collidableTiles", "player" },
+    },
+    {
+        name = "player",
+        enter = { "collidableTiles", "slime" },
+    },
 }
 
 return collisions

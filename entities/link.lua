@@ -20,28 +20,36 @@ function Link:new(opts)
     self.collider.h = 8
     self.collider.oy = 4
 
+    self:addBasicMovable()
+    self.movable.maxVelocity.x = 60
+    self.movable.maxVelocity.y = 60
+
     return self
 end
 
-function Link:update(dt)
-    local dx, dy = 0, 0
-    local speed = 60 * dt
+function Link:update(_dt)
+    local speed = 60
+    local vel = self.movable.velocity
+    vel.x = 0
+    vel.y = 0
 
     if Input.isDown("up") then
-        dy = dy - speed
+        vel.y = -speed
     elseif Input.isDown("down") then
-        dy = dy + speed
+        vel.y = speed
     end
     if Input.isDown("left") then
-        dx = dx - speed
+        vel.x = -speed
     elseif Input.isDown("right") then
-        dx = dx + speed
+        vel.x = speed
     end
-
-    self:moveWithCollider(dx, dy)
 end
 
 function Link:draw()
+end
+
+function Link:onCollide(e)
+    print(e.name)
 end
 
 return Link

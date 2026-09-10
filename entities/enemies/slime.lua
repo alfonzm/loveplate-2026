@@ -7,7 +7,7 @@ local Slime = GameObject:extend()
 function Slime:new(opts)
     Slime.super.new(self)
     opts = opts or {}
-    self.name = "myEntity"
+    self.name = "slime"
     self.x = opts.x or 0
     self.y = opts.y-4 or 0
 
@@ -28,11 +28,13 @@ function Slime:new(opts)
 
     self:addBasicMovable()
 
+    self:addBasicCollider(1)
+
     Timer.after(1, function()
         self.movable.velocity.x = -60
         self.movable.velocity.y = -60
-        self.movable.drag.x = 100
-        self.movable.drag.y = 100
+        -- self.movable.drag.x = 100
+        -- self.movable.drag.y = 100
     end)
 
     return self
@@ -44,6 +46,10 @@ end
 
 function Slime:draw()
     self.animation:draw(self.spritesheet, self.x, self.y)
+end
+
+function Slime:onCollide(e)
+    print('slime to ' .. e.name)
 end
 
 return Slime

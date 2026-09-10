@@ -64,8 +64,6 @@ function Scene:enter()
 
     for _, class in ipairs(collisions) do
         self.physicsWorld:addCollisionClass(class.name, {
-            enter = class.enter,
-            exit = class.exit,
             ignores = class.ignores,
         })
     end

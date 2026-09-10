@@ -8,9 +8,9 @@
 --     maxLookAhead = nil,        -- cap look-ahead; nil = ~20% of screen width
 --   })
 
-local smoothTime = 0.35 -- higher = slower camera catch-up
-local lookAheadSmoothTime = 0.5 -- higher = slower offset catch-up
-local velocityLookAhead = 0.5 -- px offset per unit of velocity
+local smoothTime = 0 -- higher = slower camera catch-up
+local lookAheadSmoothTime = 0 -- higher = slower offset catch-up
+local velocityLookAhead = 0 -- px offset per unit of velocity
 local maxLookAhead = nil -- defaults to ~20% of screen width in update
 
 -- Follow target lives here only; no scene entity scans.

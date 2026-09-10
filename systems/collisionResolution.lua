@@ -4,8 +4,9 @@ local collisionResolution = System(
     { "-physicsBody" },
     function(e)
         local col = e.collider
+        if not col then return end
 
-        if col and col.move then
+        if col.move then
             local dx = col.move.x or 0
             local dy = col.move.y or 0
             col.move = nil

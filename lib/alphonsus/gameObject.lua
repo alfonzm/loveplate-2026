@@ -69,17 +69,12 @@ end
 --- check if currently colliding with an object of the given collision class,
 -- and return the first object if so
 function GameObject:collidingWith(collisionClassName)
-    local body = self.physicsBody
-    if not body or not body:stay(collisionClassName) then
-        return nil
-    end
-    local stay = body:getStayCollisionData(collisionClassName)
-    if not stay or not stay[1] then
-        return nil
-    end
-    local other = stay[1].collider:getObject()
-    if other and other:is(collisionClassName) then
-        return other
+    if not self.collider then return nil end
+    for _, collider in ipairs(self:getOverlappingColliders(collisionClassName)) do
+        local other = collider:getObject()
+        if other and other:is(collisionClassName) then
+            return other
+        end
     end
     return nil
 end
@@ -110,6 +105,11 @@ end
 
 -- use this if you want to move the entity with the collider system,
 -- applying collision resolution, instead of moving the entity directly.
+-- dx,dy is the amount to move the entity by this frame, in world space.
+-- The collider system will attempt to move the entity by (dx, dy),
+-- but if it would overlap any colliders of the given collision classes,
+-- it will only move as far as possible without overlapping.
+-- this is done in the collision resolution system.
 function GameObject:moveWithCollider(dx, dy)
     local col = self.collider
     if col then
@@ -126,7 +126,12 @@ function GameObject:getColliderCenter(x, y)
     return x + (col.ox or 0), y + (col.oy or 0)
 end
 
-local function _getColliderAABB(self, x, y)
+-- 1px skin for contact checks, so flush tile contacts count as collisions
+-- not used for movement, which uses skin 0
+local CONTACT_SKIN = 1
+
+local function _getColliderAABB(self, x, y, skin)
+    skin = skin or 0
     x = x or self.x
     y = y or self.y
     local col = self.collider
@@ -135,7 +140,7 @@ local function _getColliderAABB(self, x, y)
     end
     local cx, cy = self:getColliderCenter(x, y)
     local hw, hh = col.w * 0.5, col.h * 0.5
-    return cx - hw, cy - hh, cx + hw, cy + hh
+    return cx - hw - skin, cy - hh - skin, cx + hw + skin, cy + hh + skin
 end
 
 local function _getColliderWorldAABB(collider)
@@ -171,14 +176,8 @@ local function _overlaps(self, collisionClasses, x, y)
         collisionClasses = { collisionClasses }
     end
 
-    -- get the AABB of the entity's collider at the given position
     local l1, t1, r1, b1 = _getColliderAABB(self, x, y)
-    local cx, cy = self:getColliderCenter(x, y)
-
-    -- get a list of candidate colliders near the entity's collider
-    local hw, hh = col.w * 0.5, col.h * 0.5
-    local broadRadius = math.sqrt(hw * hw + hh * hh)
-    local candidates = world:queryCircleArea(cx, cy, broadRadius, collisionClasses)
+    local candidates = world:queryRectangleArea(l1, t1, r1 - l1, b1 - t1, collisionClasses)
 
     -- check for actual AABB intersection with each candidate
     for _, collider in ipairs(candidates) do
@@ -188,6 +187,40 @@ local function _overlaps(self, collisionClasses, x, y)
         end
     end
     return false
+end
+
+-- Overlaps at (x, y), with optional skin so flush tile contacts count (movement uses skin 0).
+function GameObject:getOverlappingColliders(collisionClasses, x, y, skin)
+    local world = self.scene and self.scene.physicsWorld
+    local col = self.collider
+    if not world or not col then return {} end
+
+    if type(collisionClasses) == "string" then
+        collisionClasses = { collisionClasses }
+    end
+
+    skin = skin or CONTACT_SKIN
+    local l1, t1, r1, b1 = _getColliderAABB(self, x, y, skin)
+    local candidates = world:queryRectangleArea(l1, t1, r1 - l1, b1 - t1, collisionClasses)
+    local ownBody = self.physicsBody
+    local hits = {}
+
+    for _, collider in ipairs(candidates) do
+        if not ownBody or collider.id ~= ownBody.id then
+            local l2, t2, r2, b2 = _getColliderWorldAABB(collider)
+            if Rect.aabbIntersects(l1, t1, r1, b1, l2, t2, r2, b2) then
+                hits[#hits + 1] = collider
+            end
+        end
+    end
+
+    return hits
+end
+
+function GameObject:colliderContactObject(collider)
+    local other = collider:getObject()
+    if other then return other end
+    return { name = collider.collision_class or "unknown" }
 end
 
 -- used for entities that move with collider movement

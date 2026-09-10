@@ -27,25 +27,34 @@ local system = System(
             return
         end
 
-        local collidableClasses = getCollidableClasses(e.name)
+        local enterClasses = getCollidableClasses(e.name)
+        local exitClasses = getCollidableExitClasses(e.name)
+        local shouldTrackExit = #exitClasses > 0 or e.onCollideExit
 
-        for _, class in pairs(collidableClasses) do
-            if e.physicsBody:enter(class) then
-                local otherCollisionData = e.physicsBody:getEnterCollisionData(class)
-                local other = otherCollisionData.collider:getObject()
+        local current = {}
+        for _, class in ipairs(enterClasses) do
+            for _, collider in ipairs(e:getOverlappingColliders(class)) do
+                current[collider.id] = e:colliderContactObject(collider)
+            end
+        end
 
+        e._colliderContacts = e._colliderContacts or {}
+
+        for id, other in pairs(current) do
+            if not e._colliderContacts[id] then
                 if e.onCollide then e:onCollide(other) end
             end
         end
 
-        for _, class in pairs(getCollidableExitClasses(e.name)) do
-            if e.physicsBody:exit(class) then
-                local otherCollisionData = e.physicsBody:getExitCollisionData(class)
-                local other = otherCollisionData.collider:getObject()
-
-                if e.onCollideExit then e:onCollideExit(other) end
+        if shouldTrackExit then
+            for id, other in pairs(e._colliderContacts) do
+                if not current[id] and e.onCollideExit then
+                    e:onCollideExit(other)
+                end
             end
         end
+
+        e._colliderContacts = current
     end
 )
 

@@ -26,14 +26,22 @@ local system = System(
             end
         end
 
-        -- Update position
+        -- Update position (colliders resolve vs tiles in collisionResolution)
+        local dx, dy
         if movable.isTopdown then
-            local vx,vy = Vector.normalize(vel.x, vel.y)
-            e.x = x + (vel.x * math.abs(vx)) * dt
-            e.y = y + (vel.y * math.abs(vy)) * dt
+            local vx, vy = Vector.normalize(vel.x, vel.y)
+            dx = (vel.x * math.abs(vx)) * dt
+            dy = (vel.y * math.abs(vy)) * dt
         else
-            e.x = x + (vel.x) * dt
-            e.y = y + (vel.y) * dt
+            dx = vel.x * dt
+            dy = vel.y * dt
+        end
+
+        if e.collider then
+            e:moveWithCollider(dx, dy)
+        else
+            e.x = x + dx
+            e.y = y + dy
         end
 
         -- Apply drag if not accelerating
