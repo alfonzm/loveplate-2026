@@ -235,6 +235,10 @@ end
 function Scene:drawWorld()
     love.graphics.push()
 
+    table.sort(self.entities, function(a, b)
+        return a.y < b.y
+    end)
+
     for _, e in ipairs(self.entities) do
         local cam = self.camera
         local visible = not cam or cameraCull.isVisible(e, cam)
