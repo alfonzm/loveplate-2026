@@ -97,19 +97,19 @@ function Scene:update(dt)
         moveToAngleSystem(e, e, dt)
         movableSystem(e, e, dt)
         movesWithSystem(e, e)
-        if collisionWorld.useBump() then
+        if collisionWorld.shouldUseBump() then
             collisionAabbResolutionSystem(e, e)
         else
             collisionResolutionSystem(e, e)
         end
     end
 
-    if not collisionWorld.useBump() and self.physicsWorld then
+    if not collisionWorld.shouldUseBump() and self.physicsWorld then
         self.physicsWorld:update(dt)
     end
 
     for i, e in ipairs(self.entities) do
-        if collisionWorld.useBump() then
+        if collisionWorld.shouldUseBump() then
             collisionAabbContactsSystem(e, e)
         else
             collisionSystem(e, e)
@@ -197,7 +197,7 @@ function Scene:drawDebugOverlay()
 end
 
 function Scene:drawDebugColliders()
-    if collisionWorld.useBump() then
+    if collisionWorld.shouldUseBump() then
         collisionWorld.drawDebugBump(self)
         return
     end

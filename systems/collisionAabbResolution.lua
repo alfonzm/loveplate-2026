@@ -3,7 +3,6 @@ local collisionWorld = require "lib.alphonsus.collisionWorld"
 local collisionAabbResolution = System(
     { "collider" },
     function(col, e)
-        if not collisionWorld.useBump() then return end
         if not col.move then return end
 
         local dx = col.move.x or 0

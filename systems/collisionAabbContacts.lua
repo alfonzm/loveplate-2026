@@ -22,8 +22,6 @@ end
 local collisionAabbContacts = System(
     { "collider" },
     function(_col, e)
-        if not collisionWorld.useBump() then return end
-
         local enterClasses = getCollidableClasses(e.name)
         local exitClasses = getCollidableExitClasses(e.name)
         local shouldTrackExit = #exitClasses > 0 or e.onCollideExit
