@@ -10,10 +10,7 @@ local shack = require "lib.shack"
 local flux = require "lib.flux" -- easing
 -- local push = require "lib.push" -- resolution
 -- local gamera = require "lib.gamera" -- camera
-local wf = require "lib.windfield" -- physics
-
--- config
-local collisions = require "config.collisions"
+local collisionWorld = require "lib.alphonsus.collisionWorld"
 
 -- camera
 -- local Camera = require "alphonsus.camera"
@@ -29,6 +26,8 @@ local moveToAngleSystem = require "systems.moveToAngle"
 local rotateToTargetSystem = require "systems.rotateToTarget"
 local collisionSystem = require "systems.collision"
 local collisionResolutionSystem = require "systems.collisionResolution"
+local collisionAabbResolutionSystem = require "systems.collisionAabbResolution"
+local collisionAabbContactsSystem = require "systems.collisionAabbContacts"
 local hpSystem = require "systems.hp"
 local movesWithSystem = require "systems.movesWith"
 -- local rotatingSystem = require "systems.rotatingSystem"
@@ -59,14 +58,7 @@ function Scene:enter()
 
     self.bgOverlayColor = { 0, 0, 0, 0 }
 
-    self.physicsWorld = wf.newWorld(0, 0, false)
-    self.physicsWorld:setExplicitCollisionEvents(true)
-
-    for _, class in ipairs(collisions) do
-        self.physicsWorld:addCollisionClass(class.name, {
-            ignores = class.ignores,
-        })
-    end
+    collisionWorld.initScene(self)
 
     glowRenderer.init()
 
@@ -91,16 +83,7 @@ function Scene:add(e)
 
     if e.onSceneAdd then e:onSceneAdd() end
 
-    local col = e.collider
-    if col and col.x and col.y and col.w and col.h then
-        e.physicsBody = self.physicsWorld:newRectangleCollider(col.x, col.y, col.w, col.h)
-        local cx, cy = e:getColliderCenter()
-        e.physicsBody:setPosition(cx, cy)
-        e.physicsBody:setAngle(e.angle and e.angle or 0)
-        e.physicsBody:setCollisionClass(e.name)
-        e.physicsBody:setObject(e)
-        e.physicsBody:setType("kinematic")
-    end
+    collisionWorld.addEntity(self, e)
 
     return e
 end
@@ -114,13 +97,23 @@ function Scene:update(dt)
         moveToAngleSystem(e, e, dt)
         movableSystem(e, e, dt)
         movesWithSystem(e, e)
-        collisionResolutionSystem(e, e)
+        if collisionWorld.useBump() then
+            collisionAabbResolutionSystem(e, e)
+        else
+            collisionResolutionSystem(e, e)
+        end
     end
 
-    self.physicsWorld:update(dt)
+    if not collisionWorld.useBump() and self.physicsWorld then
+        self.physicsWorld:update(dt)
+    end
 
     for i, e in ipairs(self.entities) do
-        collisionSystem(e, e)
+        if collisionWorld.useBump() then
+            collisionAabbContactsSystem(e, e)
+        else
+            collisionSystem(e, e)
+        end
         hpSystem(e, e, dt)
         -- topDownMovementSystem(e, e, dt)
         -- rotatingSystem(e, e, dt)
@@ -204,6 +197,11 @@ function Scene:drawDebugOverlay()
 end
 
 function Scene:drawDebugColliders()
+    if collisionWorld.useBump() then
+        collisionWorld.drawDebugBump(self)
+        return
+    end
+
     local world = self.physicsWorld
     if not world then return end
 

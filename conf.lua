@@ -12,6 +12,9 @@ G = {
     fullscreen = false,
     debug = false,
     debugCollider = false,
+
+    -- "bump" (simple AABB collision system) | "windfield" (Box2D / rotating colliders)
+    collisionMode = "bump",
 }
 
 -- Playable area (hard-coded 3× logical viewport for now).

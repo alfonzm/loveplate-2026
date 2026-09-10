@@ -1,3 +1,5 @@
+local collisionWorld = require "lib.alphonsus.collisionWorld"
+
 local system = System(
     { 'toRemove' },
     function(toRemove, i, entities)
@@ -5,7 +7,7 @@ local system = System(
             local e = entities[i]
             if e.onRemove then e:onRemove() end
 
-            -- remove windfield collider
+            if e.scene then collisionWorld.removeEntity(e.scene, e) end
             if e.physicsBody then e.physicsBody:destroy() end
 
             table.remove(entities, i)

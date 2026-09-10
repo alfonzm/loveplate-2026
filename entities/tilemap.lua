@@ -2,6 +2,7 @@
 -- This entity handles rendering of tiles and setting up collision boxes on the windfield world.
 
 local GameObject = require "lib.alphonsus.gameObject"
+local collisionWorld = require "lib.alphonsus.collisionWorld"
 local sti = require "lib.sti"
 
 local Tilemap = GameObject:extend()
@@ -63,11 +64,14 @@ function Tilemap:setupCollisions()
                         local tileX = (x - 1) * self.map.tilewidth
                         local tileY = (y - 1) * self.map.tileheight
 
-                        -- if collidable, add a static collider to the windfield physics world
-                        local physicsBody = self.scene.physicsWorld:newRectangleCollider(tileX, tileY, self.map.tilewidth, self.map.tileheight)
-                        physicsBody:setPosition(tileX + self.map.tilewidth * 0.5, tileY + self.map.tileheight * 0.5)
-                        physicsBody:setCollisionClass("collidableTiles")
-                        physicsBody:setType("static") -- static colliders for tilemap
+                        collisionWorld.addTileRect(
+                            self.scene,
+                            tileX,
+                            tileY,
+                            self.map.tilewidth,
+                            self.map.tileheight,
+                            "collidableTiles"
+                        )
                     end
                 end
             end
