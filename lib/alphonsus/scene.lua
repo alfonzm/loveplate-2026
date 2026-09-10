@@ -266,7 +266,10 @@ function Scene:drawWorld()
         if cam then
             love.graphics.translate(G.width / 2 - cam.x, G.height / 2 - cam.y)
         end
+        -- this is the windfield builtin debugger, but it only draws white borders
         -- self.physicsWorld:draw(1)
+
+        -- our custom collider debugger
         self:drawDebugColliders()
         love.graphics.pop()
     end
