@@ -36,7 +36,7 @@ function Slime:new(opts)
     self.collider.oy = 4
 
     -- self.movable.velocity.x = -30
-    self.movable.velocity.y = -30
+    -- self.movable.velocity.y = -30
 
     Timer.after(1, function()
         -- "dash" movement
@@ -58,8 +58,9 @@ function Slime:draw()
 end
 
 function Slime:onCollide(e)
-    self.movable.velocity.x = 30
-    self.movable.velocity.y = 0
+    log(e.name)
+    -- self.movable.velocity.x = 30
+    -- self.movable.velocity.y = 0
 end
 
 return Slime

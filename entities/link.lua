@@ -49,7 +49,7 @@ function Link:draw()
 end
 
 function Link:onCollide(e)
-    print(e.name)
+    log(e.name)
 end
 
 return Link
