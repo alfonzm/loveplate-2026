@@ -38,12 +38,7 @@ function Link:update(dt)
         dx = dx + speed
     end
 
-    if dx ~= 0 and not self:overlaps("tilelayer", self.x + dx, self.y) then
-        self.x = self.x + dx
-    end
-    if dy ~= 0 and not self:overlaps("tilelayer", self.x, self.y + dy) then
-        self.y = self.y + dy
-    end
+    self:moveWithCollider(dx, dy)
 end
 
 function Link:draw()

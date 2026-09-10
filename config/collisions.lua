@@ -9,8 +9,8 @@
 
 local collisions = {
     { name = "wall" },
-    { name = "tilelayer" },
-    { name = "player", enter = { "tilelayer" } },
+    { name = "collidableTiles" },
+    { name = "player", enter = { "collidableTiles" } },
 }
 
 return collisions

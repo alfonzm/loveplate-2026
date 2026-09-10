@@ -66,7 +66,7 @@ function Tilemap:setupCollisions()
                         -- if collidable, add a static collider to the windfield physics world
                         local physicsBody = self.scene.physicsWorld:newRectangleCollider(tileX, tileY, self.map.tilewidth, self.map.tileheight)
                         physicsBody:setPosition(tileX + self.map.tilewidth * 0.5, tileY + self.map.tileheight * 0.5)
-                        physicsBody:setCollisionClass("tilelayer") -- todo: can be dynamic based on tile properties
+                        physicsBody:setCollisionClass("collidableTiles")
                         physicsBody:setType("static") -- static colliders for tilemap
                     end
                 end

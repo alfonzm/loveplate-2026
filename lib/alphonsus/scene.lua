@@ -28,6 +28,7 @@ local drawSystem = require "systems.draw"
 local moveToAngleSystem = require "systems.moveToAngle"
 local rotateToTargetSystem = require "systems.rotateToTarget"
 local collisionSystem = require "systems.collision"
+local collisionResolutionSystem = require "systems.collisionResolution"
 local hpSystem = require "systems.hp"
 local movesWithSystem = require "systems.movesWith"
 -- local rotatingSystem = require "systems.rotatingSystem"
@@ -100,6 +101,7 @@ function Scene:add(e)
         e.physicsBody:setAngle(e.angle and e.angle or 0)
         e.physicsBody:setCollisionClass(e.name)
         e.physicsBody:setObject(e)
+        e.physicsBody:setType("kinematic")
     end
 
     return e
@@ -114,27 +116,12 @@ function Scene:update(dt)
         moveToAngleSystem(e, e, dt)
         movableSystem(e, e, dt)
         movesWithSystem(e, e)
-
-        -- move the physics body to match the entity's position
-        -- and angle before updating the physics world
-        if e.physicsBody then
-            e.physicsBody:setLinearVelocity(0, 0)
-            local cx, cy = e:getColliderCenter()
-            e.physicsBody:setPosition(cx, cy)
-            e.physicsBody:setAngle(e.angle and e.angle or 0)
-        end
+        collisionResolutionSystem(e, e)
     end
 
     self.physicsWorld:update(dt)
 
     for i, e in ipairs(self.entities) do
-        -- after updating the physics world,
-        -- update the entity's position to match the physics body
-        if e.physicsBody then
-            local cx, cy = e.physicsBody:getPosition()
-            e:setPositionFromColliderCenter(cx, cy)
-        end
-
         collisionSystem(e, e)
         hpSystem(e, e, dt)
         -- topDownMovementSystem(e, e, dt)

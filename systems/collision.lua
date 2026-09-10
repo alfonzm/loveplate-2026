@@ -19,12 +19,16 @@ local function getCollidableExitClasses(entityName)
 end
 
 local system = System(
-    { '-collider', '-physicsBody' },
-    function (e)
+    { "-physicsBody" },
+    function(e)
+        -- if no collider, just sync the physics body and return
+        if not e.collider then
+            e:syncFromPhysicsBody()
+            return
+        end
+
         local collidableClasses = getCollidableClasses(e.name)
 
-        -- check if any collidable classes have collided
-        -- if so, call onCollide on current object
         for _, class in pairs(collidableClasses) do
             if e.physicsBody:enter(class) then
                 local otherCollisionData = e.physicsBody:getEnterCollisionData(class)

@@ -1,4 +1,5 @@
 local Object = require "lib.classic"
+local Rect = require "lib.alphonsus.rect"
 
 local GameObject = Object:extend()
 
@@ -107,6 +108,15 @@ function GameObject:addBasicCollider(scale)
     }
 end
 
+-- use this if you want to move the entity with the collider system,
+-- applying collision resolution, instead of moving the entity directly.
+function GameObject:moveWithCollider(dx, dy)
+    local col = self.collider
+    if col then
+        col.move = { x = dx, y = dy }
+    end
+end
+
 -- collider center in world space; ox/oy offset from entity x/y to collider center
 function GameObject:getColliderCenter(x, y)
     x = x or self.x
@@ -116,7 +126,32 @@ function GameObject:getColliderCenter(x, y)
     return x + (col.ox or 0), y + (col.oy or 0)
 end
 
-function GameObject:setPositionFromColliderCenter(cx, cy)
+local function _getColliderAABB(self, x, y)
+    x = x or self.x
+    y = y or self.y
+    local col = self.collider
+    if not col then
+        return x, y, x, y
+    end
+    local cx, cy = self:getColliderCenter(x, y)
+    local hw, hh = col.w * 0.5, col.h * 0.5
+    return cx - hw, cy - hh, cx + hw, cy + hh
+end
+
+local function _getColliderWorldAABB(collider)
+    local points = { collider.body:getWorldPoints(collider.fixture:getShape():getPoints()) }
+    local l, t, r, b = points[1], points[2], points[1], points[2]
+    for i = 3, #points, 2 do
+        local x, y = points[i], points[i + 1]
+        if x < l then l = x end
+        if x > r then r = x end
+        if y < t then t = y end
+        if y > b then b = y end
+    end
+    return l, t, r, b
+end
+
+local function _setPositionFromColliderCenter(self, cx, cy)
     local col = self.collider
     if not col then
         self.x, self.y = cx, cy
@@ -126,8 +161,8 @@ function GameObject:setPositionFromColliderCenter(cx, cy)
     self.y = cy - (col.oy or 0)
 end
 
--- windfield query at optional entity x/y; collisionClasses = string or list of class names
-function GameObject:overlaps(collisionClasses, x, y)
+-- check if entity would overlap any colliders of the given collision classes if it were at (x, y)
+local function _overlaps(self, collisionClasses, x, y)
     local world = self.scene and self.scene.physicsWorld
     local col = self.collider
     if not world or not col then return false end
@@ -136,9 +171,54 @@ function GameObject:overlaps(collisionClasses, x, y)
         collisionClasses = { collisionClasses }
     end
 
+    -- get the AABB of the entity's collider at the given position
+    local l1, t1, r1, b1 = _getColliderAABB(self, x, y)
     local cx, cy = self:getColliderCenter(x, y)
-    local r = math.max(col.w, col.h) * 0.5 * 0.98
-    return #world:queryCircleArea(cx, cy, r, collisionClasses) > 0
+
+    -- get a list of candidate colliders near the entity's collider
+    local hw, hh = col.w * 0.5, col.h * 0.5
+    local broadRadius = math.sqrt(hw * hw + hh * hh)
+    local candidates = world:queryCircleArea(cx, cy, broadRadius, collisionClasses)
+
+    -- check for actual AABB intersection with each candidate
+    for _, collider in ipairs(candidates) do
+        local l2, t2, r2, b2 = _getColliderWorldAABB(collider)
+        if Rect.aabbIntersects(l1, t1, r1, b1, l2, t2, r2, b2) then
+            return true
+        end
+    end
+    return false
+end
+
+-- used for entities that move with collider movement
+-- this will set the physics body position to match the entity's position
+-- and reset its velocity to zero
+function GameObject:syncToPhysicsBody()
+    if not self.physicsBody then return end
+    self.physicsBody:setLinearVelocity(0, 0)
+    local cx, cy = self:getColliderCenter()
+    self.physicsBody:setPosition(cx, cy)
+    self.physicsBody:setAngle(self.angle and self.angle or 0)
+end
+
+function GameObject:syncFromPhysicsBody()
+    if not self.physicsBody then return end
+    local cx, cy = self.physicsBody:getPosition()
+    _setPositionFromColliderCenter(self, cx, cy)
+end
+
+-- attempt to move the entity by (dx, dy), but only if
+-- it does not overlap any colliders of the given collision classes
+function GameObject:moveWithCollisions(collisionClasses, dx, dy)
+    -- check for horizontal collisions
+    if dx ~= 0 and not _overlaps(self, collisionClasses, self.x + dx, self.y) then
+        self.x = self.x + dx
+    end
+
+    -- check for vertical collisions
+    if dy ~= 0 and not _overlaps(self, collisionClasses, self.x, self.y + dy) then
+        self.y = self.y + dy
+    end
 end
 
 function GameObject:addBasicMovable()
