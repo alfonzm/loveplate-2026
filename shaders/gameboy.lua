@@ -3,13 +3,13 @@ local fromGlsl = require("shaders.fromGlsl")
 return {
     effect = fromGlsl("gameboy", "gameboy.glsl", function(shader)
 
-        -- -- https://lospec.com/palette-list/ice-cream-gb
-        -- shader:send("palette",
-        -- 	{0.486, 0.247, 0.345}, -- #7c3f58
-        -- 	{0.922, 0.420, 0.435}, -- #eb6b6f
-        -- 	{0.976, 0.659, 0.459}, -- #f9a875
-        -- 	{1.000, 0.965, 0.827}  -- #fff6d3
-        -- )
+        -- https://lospec.com/palette-list/ice-cream-gb
+        shader:send("palette",
+        	{0.486, 0.247, 0.345}, -- #7c3f58
+        	{0.922, 0.420, 0.435}, -- #eb6b6f
+        	{0.976, 0.659, 0.459}, -- #f9a875
+        	{1.000, 0.965, 0.827}  -- #fff6d3
+        )
 
         -- -- palette 2
         -- shader:send("palette",

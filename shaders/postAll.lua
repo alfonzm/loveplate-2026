@@ -1,5 +1,5 @@
 return {
-    -- require("shaders.gameboy"),
+    require("shaders.gameboy"),
     -- require("shaders.crt"),
     -- require("shaders.chromasep"),
     -- require("shaders.scanlines"),
