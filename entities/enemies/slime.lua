@@ -9,11 +9,11 @@ function Slime:new(opts)
     opts = opts or {}
     self.name = "myEntity"
     self.x = opts.x or 0
-    self.y = opts.y or 0
+    self.y = opts.y-1 or 0
 
-    self.spritesheet = love.graphics.newImage("assets/img/slime_sheet.png")
+    self.spritesheet = love.graphics.newImage("assets/img/slime-Sheet.png")
     local g = anim8.newGrid(16, 16, self.spritesheet:getWidth(), self.spritesheet:getHeight())
-    self.animation = anim8.newAnimation(g('1-3', 1, '2-2', 1), 0.15)
+    self.animation = anim8.newAnimation(g('1-4', 1), 0.18)
 
     return self
 end
