@@ -1,3 +1,15 @@
+local function getShadowTranslate(e, shadow)
+    local tx = shadow.offsetX
+    local ty = shadow.offsetY
+    if e.offsetX ~= nil or e.offsetY ~= nil then
+        -- x,y is the draw pivot; shadow offsets are from that point
+        return tx, ty
+    end
+    tx = tx + (e.offsetX or (e.width or 0) / 2)
+    ty = ty + (e.offsetY or (e.height or 0) / 2)
+    return tx, ty
+end
+
 local system = System(
     { 'draw' },
     function (draw, e)
@@ -28,11 +40,12 @@ local system = System(
             love.graphics.setColor(color[1], color[2], color[3], color[4] or 1)
             love.graphics.push()
 
+            local tx, ty = getShadowTranslate(e, shadow)
+            love.graphics.translate(tx, ty)
+
             if shadow.width and shadow.width > 0 and shadow.height and shadow.height > 0 then
-                love.graphics.translate(e.width / 2, e.height / 2 + shadow.offsetY)
                 love.graphics.ellipse("fill", e.x, e.y, shadow.width, shadow.height)
             else
-                love.graphics.translate(shadow.offsetX, shadow.offsetY)
                 e._isShadowPass = true
                 draw(e)
                 e._isShadowPass = false
