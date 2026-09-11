@@ -14,7 +14,7 @@ end
 function _RenameMe:draw()
 end
 
--- function _RenameMe:onCollide(e)
+-- function _RenameMe:onCollide(e, direction)
 -- end
 
 return _RenameMe

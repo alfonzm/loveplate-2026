@@ -57,8 +57,8 @@ function Slime:draw()
     self.animation:draw(self.spritesheet, self.x, self.y, 0, 1, 1, self.offsetX, self.offsetY)
 end
 
-function Slime:onCollide(e)
-    log(e.name)
+function Slime:onCollide(e, direction)
+    log(e.name, direction)
     -- self.movable.velocity.x = 30
     -- self.movable.velocity.y = 0
 end

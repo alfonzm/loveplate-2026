@@ -48,8 +48,8 @@ end
 function Link:draw()
 end
 
-function Link:onCollide(e)
-    log(e.name)
+function Link:onCollide(e, direction)
+    log(e.name, direction)
 end
 
 return Link

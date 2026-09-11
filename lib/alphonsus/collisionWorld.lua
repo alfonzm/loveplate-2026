@@ -149,6 +149,15 @@ function collisionWorld.contactObject(other)
     return { name = other.name or "unknown" }
 end
 
+function collisionWorld.collideDirection(from, other)
+    if not other.x or not other.y then
+        return nil
+    end
+    local fx, fy = from:getColliderCenter()
+    local dx, dy = Vector.normalize(other.x - fx, other.y - fy)
+    return { dx = dx, dy = dy }
+end
+
 function collisionWorld.drawDebugBump(scene)
     if not scene.bumpWorld then return end
 

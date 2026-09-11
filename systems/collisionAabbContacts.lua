@@ -39,7 +39,9 @@ local collisionAabbContacts = System(
 
         for id, other in pairs(current) do
             if not e._colliderContacts[id] then
-                if e.onCollide then e:onCollide(other) end
+                if e.onCollide then
+                    e:onCollide(other, collisionWorld.collideDirection(e, other))
+                end
             end
         end
 
