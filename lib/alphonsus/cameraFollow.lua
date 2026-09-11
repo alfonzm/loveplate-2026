@@ -85,9 +85,9 @@ local function cleanup(scene)
     followOffsetY = 0
     lookAheadX = 0
     lookAheadY = 0
-    smoothTime = 0.35
-    lookAheadSmoothTime = 0.5
-    velocityLookAhead = 0.5
+    smoothTime = 0
+    lookAheadSmoothTime = 0
+    velocityLookAhead = 0
     maxLookAhead = nil
 end
 
