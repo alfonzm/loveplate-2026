@@ -54,6 +54,16 @@ function Color.fromHex(hex)
     }
 end
 
+--- Vec3 colors for palette uniforms (one entry per hex string).
+function Color.paletteFromHexes(hexes)
+    local palette = {}
+    for i, hex in ipairs(hexes) do
+        local c = Color.fromHex(hex)
+        palette[i] = { c[1], c[2], c[3] }
+    end
+    return palette
+end
+
 --- Returns a new { r, g, b, a } with the given hue (0–1). Saturation, lightness, and alpha are preserved.
 function Color.toHue(color, hue)
     local r, g, b = color[1], color[2], color[3]
