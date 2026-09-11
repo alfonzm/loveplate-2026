@@ -1,9 +1,9 @@
 return {
     -- NICE PALETTES
 
-    -- pink and blue, saturated
-    -- https://lospec.com/palette-list/autumn-chill
-    { "#2c1e74", "#c23a73", "#d58863", "#ffffff" },
+    -- -- pink and blue, saturated
+    -- -- https://lospec.com/palette-list/autumn-chill
+    -- { "#2c1e74", "#c23a73", "#d58863", "#ffffff" },
 
     -- nice icy blue
     -- https://lospec.com/palette-list/bluedream4
