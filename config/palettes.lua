@@ -1,6 +1,9 @@
 return {
     -- NICE PALETTES
 
+    -- nice icy blue
+    { "#1f285d", "#4b849a", "#98d8b1", "#ecf2cb" },
+
     -- https://lospec.com/palette-list/ice-cream-gb
     { "#7c3f58", "#eb6b6f", "#f9a875", "#fff6d3" },
 
