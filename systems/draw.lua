@@ -14,6 +14,9 @@ local system = System(
     { 'draw' },
     function (draw, e)
         assert(type(draw) == 'function')
+        if e.visible == false then
+            return
+        end
 
         love.graphics.setColor(1, 1, 1, 1)
 

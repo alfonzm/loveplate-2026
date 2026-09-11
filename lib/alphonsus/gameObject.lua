@@ -10,12 +10,24 @@ local function clearDieInTimer(self)
     end
 end
 
+local function clearFlickerTimers(self)
+    if self._flickerEveryTimer then
+        self._flickerEveryTimer:remove()
+        self._flickerEveryTimer = nil
+    end
+    if self._flickerEndTimer then
+        self._flickerEndTimer:remove()
+        self._flickerEndTimer = nil
+    end
+end
+
 function GameObject:new()
     self.name = "gameObject"
 end
 
 function GameObject:remove()
     clearDieInTimer(self)
+    clearFlickerTimers(self)
     self.toRemove = true
 end
 
@@ -26,6 +38,27 @@ function GameObject:dieIn(seconds)
         if not self.toRemove then
             self:remove()
         end
+    end)
+end
+
+function GameObject:flicker(duration, interval)
+    clearFlickerTimers(self)
+    duration = duration or 0.8
+    interval = interval or 0.05
+
+    if self.visible == nil then
+        self.visible = true
+    end
+
+    -- flip visibility every interval seconds
+    self._flickerEveryTimer = Timer.every(interval, function()
+        self.visible = not self.visible
+    end)
+
+    -- stop flickering after duration seconds
+    self._flickerEndTimer = Timer.after(duration, function()
+        clearFlickerTimers(self)
+        self.visible = true
     end)
 end
 
