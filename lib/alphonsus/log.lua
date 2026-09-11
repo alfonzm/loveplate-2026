@@ -21,15 +21,27 @@ Log.stringify = function(t)
 	return "{" .. string .. "}"
 end
 
--- print table inline
-Log.print = function(t)
-	info = debug.getinfo(2, "Sl")
-	lineinfo = info.short_src .. ":" .. info.currentline .. ": "
+local function formatArg(v)
+	if v == nil then
+		return "nil"
+	end
+	if type(v) == "table" then
+		return Log.stringify(v)
+	end
+	return tostring(v)
+end
+
+-- print tables inline; accepts any number of args (like print)
+Log.print = function(...)
+	local info = debug.getinfo(2, "Sl")
+	local lineinfo = info.short_src .. ":" .. info.currentline .. ": "
 	io.write(lineinfo)
-	if t and type(t) == 'table' then
-		io.write(Log.stringify(t))
-	elseif type(t) == 'string' then
-		io.write(t)
+	local n = select("#", ...)
+	for i = 1, n do
+		if i > 1 then
+			io.write("\t")
+		end
+		io.write(formatArg(select(i, ...)))
 	end
 	io.write("\n")
 end
